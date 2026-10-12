@@ -486,3 +486,18 @@ class CapTestCase(cases.BaseServerTestCase):
         self.sendLine(nick, cap_ls)
         responses = [msg for msg in self.getMessages(nick) if msg.command == "CAP"]
         self.assertLessEqual(len(responses), 1, responses)
+
+    @cases.mark_capabilities("server-time")
+    def testReqNoTagsOnAck(self):
+        """Test the server only applies cap tags after acking the request.
+        <http://ircv3.net/specs/core/capability-negotiation-3.1.html>
+        <https://github.com/ircv3/ircv3-specifications/issues/616>
+        """
+        self.addClient(1)
+        self.sendLine(1, "CAP LS")
+        self.getCapLs(1)
+        self.sendLine(1, "USER foo foo foo :foo")
+        self.sendLine(1, "NICK foo")
+
+        m = self.requestCapabilities(1, ["server-time"], skip_if_cap_nak=True)
+        self.assertNotIn("time", m.tags)
