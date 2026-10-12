@@ -283,7 +283,11 @@ def generate_workflow(config: dict, version_flavor: VersionFlavor):
 
     on: dict
     if version_flavor == VersionFlavor.STABLE:
-        on = {"push": None, "pull_request": None}
+        on = {
+            "push": None,
+            "pull_request": None,
+            "workflow_dispatch": None,
+        }
     else:
         relative_workflow = str(workflow_filename.relative_to(ROOT_PATH))
         # Run every saturday and sunday 8:51 UTC, and every day at 17:51
